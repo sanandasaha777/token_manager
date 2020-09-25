@@ -1,0 +1,48 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mongodb-version: [4.2]
+
+    steps:
+      - name: Start MongoDB v${{ matrix.mongodb-version }}
+        uses: supercharge/mongodb-github-action@1.2.0
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
+
+      - uses: actions/checkout@v2
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.7.1
+
+      - name: Ruby gem cache dependencies
+        uses: actions/cache@preview
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gem-
+
+      - name: bundle install
+        env:
+          RAILS_ENV: test
+        run: |
+          gem install bundler
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+
+      - name: Run RSpec
+        run: bundle exec rspec
+        env:
+          RAILS_ENV: test
