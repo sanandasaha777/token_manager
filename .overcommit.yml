@@ -1,0 +1,38 @@
+CommitMsg:
+  CapitalizedSubject:
+    enabled: true
+
+  EmptyMessage:
+    enabled: true
+
+  TrailingPeriod:
+    enabled: true
+
+  TextWidth:
+    enabled: false
+
+  HardTabs:
+    enabled: true
+
+PreCommit:
+  ALL:
+    on_warn: fail
+
+  AuthorEmail:
+    enabled: true
+
+  AuthorName:
+    enabled: true
+
+  MergeConflicts:
+    enabled: true
+
+  BundleCheck:
+    enabled: true
+
+  RuboCop:
+    enabled: true
+
+PreRebase:
+  MergedCommits:
+    enabled: true
