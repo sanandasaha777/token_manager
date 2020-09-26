@@ -71,6 +71,26 @@ describe V1::TokensController, type: :controller do
     end
   end
 
+  describe "PUT #keep_alive" do
+    let(:token) { create(:token) }
+
+    context "when token is assigned" do
+      it "should render with ok status code" do
+        token.keep_alive
+        put :keep_alive, params: { id: token._id.to_s }
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "when token is expired" do
+      it "should render with unprocessable entity status code" do
+        token.update(assigned_at: DateTime.now - 10.minutes)
+        put :keep_alive, params: { id: token._id.to_s }
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+  end
+
   describe "PUT #unblock" do
     let(:token) { create(:token) }
 

@@ -22,11 +22,20 @@ class V1::TokensController < ApplicationController
     end
   end
 
+  def keep_alive
+    token = Token.assigned.find(params[:id])
+
+    if token.alive? && token.keep_alive
+      render status: :ok, json: { message: "Token alived" }
+    else
+      render status: :unprocessable_entity, json: { message: "Token expired" }
+    end
+  end
+
   def unblock
     token = Token.assigned.find(params[:id])
 
-    if token.assigned_at > DateTime.now - 1.minutes
-      token.unblock
+    if token.alive? && token.unblock
       render status: :ok, json: { message: "Token unblocked" }
     else
       render status: :unprocessable_entity, json: { message: "Token expired" }

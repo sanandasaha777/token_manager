@@ -50,4 +50,20 @@ RSpec.describe Token, type: :model do
       expect(token.assigned_at).to eq(nil)
     end
   end
+
+  describe ".alive?" do
+    context "when token is alive" do
+      it "should return true" do
+        token.keep_alive
+        expect(token.alive?).to eq(true)
+      end
+    end
+
+    context "when token is expired" do
+      it "should return false" do
+        token.update(assigned_at: DateTime.now - 5.minutes)
+        expect(token.alive?).to eq(false)
+      end
+    end
+  end
 end

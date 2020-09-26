@@ -30,4 +30,8 @@ class Token
   def unblock
     update(expire_at: DateTime.now, assigned_at: nil)
   end
+
+  def alive?
+    assigned_at > DateTime.now - 1.minutes
+  end
 end
