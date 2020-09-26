@@ -19,13 +19,14 @@ RSpec.describe Token, type: :model do
 
   describe "#available" do
     let!(:available_token) { create(:token) }
-    let!(:blocked_token)   { create(:token, expire_at: DateTime.now - 1.hours, assigned_at: DateTime.now - 2.hours) }
+    let!(:blocked_token)   { create(:token, assigned_at: Time.now - 2.hours) }
 
     it "should return available token" do
       expect(Token.available).to include(available_token)
     end
 
     it "should not return blocked token" do
+      blocked_token.update(expire_at: Time.now - 1.hour)
       expect(Token.available).not_to include(blocked_token)
     end
   end
@@ -61,7 +62,7 @@ RSpec.describe Token, type: :model do
 
     context "when token is expired" do
       it "should return false" do
-        token.update(assigned_at: DateTime.now - 5.minutes)
+        token.update(assigned_at: Time.now - 5.minutes)
         expect(token.alive?).to eq(false)
       end
     end

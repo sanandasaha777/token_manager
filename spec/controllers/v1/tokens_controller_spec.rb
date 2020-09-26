@@ -84,7 +84,7 @@ describe V1::TokensController, type: :controller do
 
     context "when token is expired" do
       it "should render with unprocessable entity status code" do
-        token.update(assigned_at: DateTime.now - 10.minutes)
+        token.update(assigned_at: Time.now - 10.minutes)
         put :keep_alive, params: { id: token._id.to_s }
         expect(response).to have_http_status(:unprocessable_entity)
       end
@@ -118,7 +118,7 @@ describe V1::TokensController, type: :controller do
 
     context "when token is expired" do
       it "should render with unprocessable entity status code" do
-        token.update(assigned_at: DateTime.now - 10.minutes)
+        token.update(assigned_at: Time.now - 10.minutes)
         put :unblock, params: { id: token._id.to_s }
         expect(response).to have_http_status(:unprocessable_entity)
       end
