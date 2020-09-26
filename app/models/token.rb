@@ -11,6 +11,8 @@ class Token
   # when expire time limit overs
   index({ expire_at: 1 }, { expire_after_seconds: 5.minutes })
 
+  scope :assigned, -> { where.not(assigned_at: nil) }
+
   def self.available
     time = DateTime.now
 
@@ -23,5 +25,9 @@ class Token
   def keep_alive
     time = DateTime.now
     update(expire_at: time, assigned_at: time)
+  end
+
+  def unblock
+    update(expire_at: DateTime.now, assigned_at: nil)
   end
 end

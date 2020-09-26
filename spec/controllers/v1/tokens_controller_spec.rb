@@ -70,6 +70,40 @@ describe V1::TokensController, type: :controller do
       end
     end
   end
+
+  describe "PUT #unblock" do
+    let(:token) { create(:token) }
+
+    context "when token is assigned" do
+      it "should render with ok status code" do
+        token.keep_alive
+        put :unblock, params: { id: token._id.to_s }
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "should set assigned_at nil" do
+        token.keep_alive
+        put :unblock, params: { id: token._id.to_s }
+        expect(token.reload.assigned_at).to eq(nil)
+      end
+    end
+
+    context "when token is available" do
+      it "should render with not found status code" do
+        token.unblock
+        put :unblock, params: { id: token._id.to_s }
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when token is expired" do
+      it "should render with unprocessable entity status code" do
+        token.update(assigned_at: DateTime.now - 10.minutes)
+        put :unblock, params: { id: token._id.to_s }
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+  end
 end
 
 def parsed_response

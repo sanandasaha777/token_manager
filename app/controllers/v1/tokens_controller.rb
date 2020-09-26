@@ -21,4 +21,15 @@ class V1::TokensController < ApplicationController
       render status: :not_found, json: { message: "Record not found" }
     end
   end
+
+  def unblock
+    token = Token.assigned.find(params[:id])
+
+    if token.assigned_at > DateTime.now - 1.minutes
+      token.unblock
+      render status: :ok, json: { message: "Token unblocked" }
+    else
+      render status: :unprocessable_entity, json: { message: "Token expired" }
+    end
+  end
 end
