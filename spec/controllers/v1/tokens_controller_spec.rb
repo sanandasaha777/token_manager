@@ -43,4 +43,35 @@ describe V1::TokensController, type: :controller do
       end
     end
   end
+
+  describe "GET #assign" do
+    before(:each) { Token.destroy_all }
+
+    context "when token is available" do
+      let(:available_token) { create(:token) }
+
+      it "should render with ok status code" do
+        available_token
+        get :assign
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "should assign one token" do
+        available_token
+        get :assign
+        expect(parsed_response["key"]).not_to eq(nil)
+      end
+    end
+
+    context "when token is not available" do
+      it "should render with not found status code" do
+        get :assign
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+end
+
+def parsed_response
+  JSON.parse(response.body)
 end
