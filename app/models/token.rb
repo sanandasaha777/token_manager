@@ -1,6 +1,5 @@
 class Token
   include Mongoid::Document
-  include Mongoid::Timestamps
 
   field :assigned_at, type: DateTime
   field :expire_at, type: DateTime
