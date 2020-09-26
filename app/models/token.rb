@@ -5,11 +5,14 @@ class Token
   field :assigned_at, type: DateTime
   field :expire_at, type: DateTime
 
+  MAX_IDLE_TIME = 5.minutes
+  SHELF_LIFE = 1.minutes
+
   index({ assigned_at: 1 })
 
   # MongoDB TTL index, this index will automatically delete
   # when expire time limit overs
-  index({ expire_at: 1 }, { expire_after_seconds: 5.minutes })
+  index({ expire_at: 1 }, { expire_after_seconds: MAX_IDLE_TIME })
 
   before_create :set_expire_at
 
@@ -18,10 +21,10 @@ class Token
   def self.available
     time = Time.now
 
-    self.or({ :expire_at.gte => time - 5.minutes,
+    self.or({ :expire_at.gte => time - MAX_IDLE_TIME,
               :assigned_at => nil })
-        .or({ :expire_at.gte => time - 5.minutes,
-              :assigned_at.lt => time - 1.minutes })
+        .or({ :expire_at.gte => time - MAX_IDLE_TIME,
+              :assigned_at.lt => time - SHELF_LIFE })
   end
 
   def keep_alive
@@ -34,7 +37,7 @@ class Token
   end
 
   def alive?
-    assigned_at > Time.now - 1.minutes
+    assigned_at > Time.now - SHELF_LIFE
   end
 
   private
